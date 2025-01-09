@@ -1,5 +1,3 @@
-// static/script.js
-
 document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
   const oldMedsList = document.getElementById("old-meds-list");
@@ -9,6 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const genderSelect = document.getElementById("gender-select");
 
   const bpInput = document.getElementById("bp-input");
+
+  const allergiesList = document.getElementById("allergies-list");
+  const addAllergyBtn = document.getElementById("add-allergy");
 
   const previousConditionsList = document.getElementById("previous-conditions-list");
   const addPreviousConditionBtn = document.getElementById("add-previous-condition");
@@ -56,6 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
     oldMedsList.appendChild(inputGroup);
   });
 
+  // Add allergy
+  addAllergyBtn.addEventListener("click", () => {
+    const inputGroup = createInputGroup(["Allergy Name", "Reaction"]);
+    allergiesList.appendChild(inputGroup);
+  });
+
   // Add previous condition
   addPreviousConditionBtn.addEventListener("click", () => {
     const inputGroup = createInputGroup(["Previous Condition (e.g., hypertension, diabetes)"]);
@@ -88,6 +95,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+    const allergies = [];
+    allergiesList.querySelectorAll(".input-group").forEach(div => {
+      const inputs = div.querySelectorAll("input");
+      if (inputs.length === 2) {
+        const nameVal = inputs[0].value.trim();
+        const reactionVal = inputs[1].value.trim();
+        if (nameVal && reactionVal) {
+          allergies.push({ name: nameVal, reaction: reactionVal });
+        }
+      }
+    });
+
     const previousConditions = [];
     previousConditionsList.querySelectorAll(".input-group").forEach(div => {
       const input = div.querySelector("input");
@@ -116,12 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const payload = {
       oldMeds,
+      allergies,
       age: ageSelect.value.trim(),
       gender: genderSelect.value.trim(),
       previousConditions,
       currentConditions,
       bp: bpInput.value.trim(),
-      newDisease: "",  // Removed new disease input as per prompt
       newMeds
     };
 

@@ -17,9 +17,9 @@ The user will provide structured input with potential spelling errors. You must:
 1. Correct minor spelling errors if present.
 2. Identify any potential negative interactions or issues among:
    - Old medicines
+   - Allergies
    - Old diseases
    - New medicines
-   - New disease
    - Current conditions (e.g., pregnancy, diabetes)
    - Age, gender, blood pressure
 3. Provide only an analysis of possible problems or interactions.
@@ -28,12 +28,12 @@ The user will provide structured input with potential spelling errors. You must:
 
 User input fields:
 - Old medicines + dosage (multiple possible)
+- Allergies + reaction (multiple possible)
 - Old diseases (multiple possible)
 - Age
 - Gender
 - Current conditions (e.g., pregnant, diabetes)
 - Blood pressure
-- New disease
 - New medicines + dosage (multiple possible)
 
 Format your answer as follows:
@@ -42,13 +42,16 @@ Format your answer as follows:
 1. Drug Interactions:
    [List any potential interactions among old and new medicines]
 
-2. Disease and Medicine Interactions:
+2. Allergies and Medicine Interactions:
+   [List any potential interactions between allergies and medicines]
+
+3. Disease and Medicine Interactions:
    [List any potential interactions between diseases and medicines]
 
-3. Condition-Specific Concerns:
+4. Condition-Specific Concerns:
    [Highlight concerns related to pregnancy, diabetes, or other conditions]
 
-4. Age/Gender/Blood Pressure-Related Issues:
+5. Age/Gender/Blood Pressure-Related Issues:
    [Mention any age, gender, or blood pressure-specific concerns]
 
 Disclaimer:
@@ -96,6 +99,7 @@ def analyze():
     data = request.get_json()
 
     old_meds = data.get('oldMeds', [])
+    allergies = data.get('allergies', [])
     age = data.get('age', '')
     gender = data.get('gender', '')
     previous_conditions = data.get('previousConditions', [])
@@ -110,6 +114,11 @@ def analyze():
         user_message += "Old medicines + dosage:\n"
         for med in old_meds:
             user_message += f" - {med.get('name', 'unknown')} ({med.get('dosage', 'unknown')})\n"
+
+    if allergies:
+        user_message += "Allergies:\n"
+        for allergy in allergies:
+            user_message += f" - {allergy.get('name', 'unknown')} (Reaction: {allergy.get('reaction', 'unknown')})\n"
 
     user_message += f"Age: {age}\n"
     user_message += f"Gender: {gender}\n"
@@ -133,7 +142,6 @@ def analyze():
 
     # Send user message to OpenAI's API
     bot_response = get_medical_analysis(user_message)
-
 
     return jsonify({'response': bot_response}), 200
 
